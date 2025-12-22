@@ -4,7 +4,7 @@
 
 
 # The crt-build script is used to detemine build metadata and create terraform-mcp-server builds.
-# We use it in build.yml for building release artifacts with CRT in the Go Build step. 
+# We use it in build.yml for building release artifacts with CRT in the Go Build step.
 
 set -euo pipefail
 
@@ -84,7 +84,10 @@ function build() {
 
 # Run the CRT Builder
 function main() {
-  case $1 in
+  # Assign the first argument or an empty string if it's not provided
+  local sub_command="${1:-}"
+
+  case "$sub_command" in
   build)
     build
   ;;
@@ -97,10 +100,16 @@ function main() {
     build_revision
   ;;
   *)
-    echo "unknown sub-command" >&2
+    # Provide a more informative error message when no subcommand is given
+    if [ -z "$sub_command" ]; then
+      echo "Error: No sub-command provided. Usage: $0 [build|date|revision]" >&2
+    else
+      echo "Error: Unknown sub-command '$sub_command'. Usage: $0 [build|date|revision]" >&2
+    fi
     exit 1
   ;;
   esac
 }
 
 main "$@"
+
